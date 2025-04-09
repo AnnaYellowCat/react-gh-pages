@@ -6,6 +6,16 @@ on:
   workflow_dispatch: 
 
 jobs:
+  linter:
+  runs-on: ubuntu-latest
+
+  steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: Run linter
+      run: npm run lint
+
   build:
 
     runs-on: ubuntu-latest
@@ -26,8 +36,8 @@ jobs:
     - name: Install dependencies
       run: npm install
 
-    - name: Run linter
-      run: npm run lint
+    # - name: Run linter
+    #   run: npm run lint
 
     - name: Build
       run: npm run build
@@ -58,4 +68,3 @@ jobs:
         user_email: 'github-actions[bot]@users.noreply.github.com'
         github_token: ${{ secrets.ACTIONS_DEPLOY_ACCESS_TOKEN }}
         repository: ${{ github.repository }}
-        #...
