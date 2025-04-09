@@ -1,8 +1,9 @@
-name: Deploy
+cicd: name: CI/CD Pipeline
 
 on:
   push:
     branches: [ master ]
+  workflow_dispatch: 
 
 jobs:
   build:
@@ -25,8 +26,25 @@ jobs:
     - name: Install dependencies
       run: npm install
 
+    - name: Run linter
+      run: npm run lint
+
     - name: Build
       run: npm run build
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.event_name == 'workflow_dispatch'
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v1
+      with:
+        node-version: 20.x
 
     - name: Deploy
       run: |
@@ -35,10 +53,7 @@ jobs:
         git remote set-url origin https://${github_token}@github.com/${repository}
         npm run deploy
       env:
-
         user_name: 'github-actions[bot]'
         user_email: 'github-actions[bot]@users.noreply.github.com'
         github_token: ${{ secrets.ACTIONS_DEPLOY_ACCESS_TOKEN }}
-        repository: ${{ github.repository }} 
-        #fjdjdijfjd
-      
+        repository: ${{ github.repository }}
